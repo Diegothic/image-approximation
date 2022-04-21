@@ -6,8 +6,8 @@ class Random {
 
 public:
 
-	Random();
-	virtual ~Random() {}
+	Random() = default;
+	virtual ~Random() = default;
 
 	uint16_t rangedInt(const uint16_t& min, const uint16_t& max);
 	double rangedDouble(const double& min, const double& max);

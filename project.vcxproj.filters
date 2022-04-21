@@ -49,4 +49,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="reference.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="example.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

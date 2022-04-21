@@ -169,6 +169,10 @@
     <ClInclude Include="src\Ellipse.h" />
     <ClInclude Include="src\Random.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="example.jpg" />
+    <Image Include="reference.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

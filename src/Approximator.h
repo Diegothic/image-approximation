@@ -21,7 +21,7 @@ public:
 		uint16_t progressStep
 	);
 
-	virtual ~Approximator() {}
+	virtual ~Approximator() = default;
 
 	Approximator& selectReference();
 	Approximator& selectDestination();

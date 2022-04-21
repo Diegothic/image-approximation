@@ -19,7 +19,7 @@ public:
 	Ellipse(const Ellipse& that);
 	Ellipse& operator=(const Ellipse& that);
 
-	virtual ~Ellipse() {}
+	virtual ~Ellipse() = default;
 
 public:
 

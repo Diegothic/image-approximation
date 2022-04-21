@@ -14,6 +14,7 @@ Approximator::Approximator() {
 
 	m_ellipses = 100;
 	m_progressStep = 5;
+	m_brushSize = 5;
 }
 
 Approximator::Approximator(
@@ -23,18 +24,19 @@ Approximator::Approximator(
 	uint16_t progressStep
 ) {
 
-	m_referencePath = ref;
+	m_referencePath = std::move(ref);
 	m_reference = cv::imread(m_referencePath, cv::IMREAD_COLOR);
-	m_outputDir = out;
+	m_outputDir = std::move(out);
 
 	m_ellipses = ellipses;
 	m_progressStep = progressStep;
+	m_brushSize = 5;
 }
 
 Approximator& Approximator::selectReference() {
 
 	std::string input;
-	std::string defPath = m_referencePath;
+	const std::string defPath = m_referencePath;
 
 	while (true) {
 		std::cout << "Path to reference image: " << std::endl;
@@ -65,7 +67,7 @@ Approximator& Approximator::selectReference() {
 Approximator& Approximator::selectDestination() {
 
 	std::string input;
-	std::string defPath = m_outputDir;
+	const std::string defPath = m_outputDir;
 
 	while (true) {
 		std::cout << "Output directory: " << std::endl;
@@ -92,7 +94,7 @@ Approximator& Approximator::selectDestination() {
 
 Approximator& Approximator::selectConfiguration() {
 
-	std::regex numberRegex("[0-9]+");
+	const std::regex numberRegex("[0-9]+");
 	std::string input;
 
 	while (true) {
@@ -137,8 +139,8 @@ void Approximator::initCanvas() {
 
 void Approximator::recreate() {
 
-	m_brushSize = (uint16_t)(m_reference.size().width + m_reference.size().height) / 2.0;
-	uint8_t brushStep = std::max(m_ellipses / 20, 1);
+	m_brushSize = (uint16_t)((m_reference.size().width + m_reference.size().height) / 2.0);
+	const uint8_t brushStep = std::max(m_ellipses / 25, 1);
 
 	for (int ellipseNum = 0; ellipseNum < m_ellipses; ellipseNum++) {
 		Ellipse candidate = findNewEllipse();
@@ -146,19 +148,12 @@ void Approximator::recreate() {
 
 		candidate.apply(m_canvas);
 
-		if ((ellipseNum + 1) % m_progressStep == 0
-			|| ellipseNum == m_ellipses - 1) {
-
+		if ((ellipseNum + 1) % m_progressStep == 0 || ellipseNum == m_ellipses - 1) {
 			outputProgress(ellipseNum + 1);
 		}
 
-		if (ellipseNum != 0
-			&& ellipseNum % brushStep == 0) {
-
-			m_brushSize = m_brushSize * 0.9;
-			if (m_brushSize < 5) {
-				m_brushSize = 5;
-			}
+		if (ellipseNum != 0 && ellipseNum % brushStep == 0) {
+			m_brushSize = std::max((int)(m_brushSize * 0.8), 5);
 		}
 	}
 
@@ -169,7 +164,7 @@ void Approximator::recreate() {
 Ellipse Approximator::findNewEllipse() const {
 
 	Comparator comp(m_reference, m_canvas, 2);
-	double currentFit = comp.fitness();
+	const double currentFit = comp.fitness();
 
 	Ellipse candidate = Ellipse::randomizedInBounds(m_reference.size(), 1, m_brushSize);
 	cv::Mat copy = cv::Mat::zeros(m_reference.size(), CV_8UC3);
@@ -200,7 +195,7 @@ Ellipse Approximator::findBestMutation(const Ellipse& candidate) const {
 
 	Ellipse mutated = candidate;
 	cv::Mat copy = cv::Mat::zeros(m_reference.size(), CV_8UC3);
-	double mutatedFit{};
+	double mutatedFit;
 
 	for (uint8_t i = 0; i < 100; i++) {
 		mutated = candidate.mutated();
@@ -212,6 +207,7 @@ Ellipse Approximator::findBestMutation(const Ellipse& candidate) const {
 		mutatedFit = comp.fitness();
 
 		if (mutatedFit > currentFit) {
+			currentFit = mutatedFit;
 			best = mutated;
 		}
 	}
@@ -224,7 +220,7 @@ void Approximator::outputProgress(int num) const {
 	std::string output = m_outputDir + "\\" + std::to_string(num) + ".jpg";
 	cv::imwrite(output, m_canvas);
 
-	Comparator comp(m_reference, m_canvas, 2);
+	const Comparator comp(m_reference, m_canvas, 2);
 
 	std::cout << "Progress saved with { "
 		<< num

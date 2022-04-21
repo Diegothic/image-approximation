@@ -8,7 +8,7 @@ class Comparator {
 public:
 	Comparator(const cv::Mat& imgA, const cv::Mat& imgB, const uint8_t& parts);
 
-	~Comparator() {}
+	virtual ~Comparator() = default;
 
 	void setImages(const cv::Mat& imgA, const cv::Mat& imgB);
 
